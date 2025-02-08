@@ -31,8 +31,8 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/my-server-ec2-1.pem ubuntu@ec2-3-106-217-77.ap-southeast-2.compute.amazonaws.com "
           cd /var/www/personal_portfolio &&
-          git pull origin main &&
-          composer install --no-dev &&
-          php artisan migrate --force &&
-          php artisan config:cache 
+          sudo git pull origin main &&
+          sudo composer install --no-dev &&
+          sudo php artisan migrate --force &&
+          sudo php artisan config:cache 
           "
