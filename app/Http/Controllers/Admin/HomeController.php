@@ -53,7 +53,7 @@ class HomeController extends Controller
 
     public function files()
     {
-        $files = File::all();  // Retrieve all files from the database
+        $files = File::all();  
         
         return view('admin.files', compact('files'));
     }

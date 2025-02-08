@@ -29,20 +29,6 @@ class PersonalController extends Controller
 
         $files = File::where('user_id',2)->get(); 
 
-        
-
-
-        // return response()->json([
-        //     'user_info' => $user_info,
-        //     'user_contact' => $user_contact,
-        //     'user_education' => $user_education,
-        //     'user_experience' => $user_experience,
-        //     'user_profile' => $user_profile,
-        //     'user_skill' => $user_skill,
-        //     'id' => $id,
-        //     'files' => $files
-        // ]);
-
 
       return view('personal-portforlio.index',compact('user_info','user_contact','user_education','user_experience','user_profile','user_skill','id','files'));
     }
