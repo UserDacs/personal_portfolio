@@ -24,16 +24,22 @@ jobs:
       - name: Create SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/my-server-ec2-1.pem
+          echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > ~/.ssh/my-server-ec2-1.pem
           chmod 600 ~/.ssh/my-server-ec2-1.pem
+          ssh-keygen -p -m PEM -f ~/.ssh/my-server-ec2-1.pem -N "" || true
+
+      - name: Add SSH Key to Agent
+        run: |
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/my-server-ec2-1.pem
 
       - name: Deploy to AWS EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/my-server-ec2-1.pem ubuntu@ec2-3-106-217-77.ap-southeast-2.compute.amazonaws.com "
-          sudo su
-          cd /var/www/dumala &&
-          git pull origin main &&
-          composer install --no-dev &&
-          php artisan migrate --force &&
-          php artisan config:cache 
-          "
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/my-server-ec2-1.pem ubuntu@ec2-3-106-217-77.ap-southeast-2.compute.amazonaws.com << 'EOF'
+            sudo su
+            cd /var/www/personal_portfolio
+            git pull origin main
+            composer install --no-dev
+            php artisan migrate --force
+            php artisan config:cache
+          EOF
