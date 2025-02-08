@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -20,21 +21,18 @@ jobs:
           extensions: mbstring, mysql, xml
           coverage: none
 
-      - name: Set Up SSH Key
+      - name: Create SSH Key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/my-server-ec2-1.pem
           chmod 600 ~/.ssh/my-server-ec2-1.pem
 
-      - name: Test SSH Connection
-        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/my-server-ec2-1.pem ubuntu@ec2-3-106-217-77.ap-southeast-2.compute.amazonaws.com exit
-
       - name: Deploy to AWS EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/my-server-ec2-1.pem ubuntu@ec2-3-106-217-77.ap-southeast-2.compute.amazonaws.com "
           cd /var/www/personal_portfolio &&
-          sudo git pull origin main &&
-          sudo composer install --no-dev &&
-          sudo php artisan migrate --force &&
-          sudo php artisan config:cache 
+          git pull origin main &&
+          composer install --no-dev &&
+          php artisan migrate --force &&
+          php artisan config:cache 
           "
