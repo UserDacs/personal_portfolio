@@ -38,3 +38,4 @@ jobs:
           sudo php artisan migrate --force &&
           sudo php artisan config:cache 
           "
+          
