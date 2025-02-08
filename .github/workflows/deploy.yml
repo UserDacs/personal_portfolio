@@ -24,15 +24,20 @@ jobs:
       - name: Create SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/my-server-ec2-1.pem
+          echo "${{ secrets.EC2_SSH_KEY }}" | sed 's/\\n/\n/g' > ~/.ssh/my-server-ec2-1.pem
           chmod 600 ~/.ssh/my-server-ec2-1.pem
+          ssh-keygen -p -m PEM -f ~/.ssh/my-server-ec2-1.pem -N ""  # Convert to OpenSSH format
+
+      - name: Debug SSH Connection
+        run: |
+          ssh -vvv -o StrictHostKeyChecking=no -i ~/.ssh/my-server-ec2-1.pem ubuntu@ec2-3-106-217-77.ap-southeast-2.compute.amazonaws.com "echo 'SSH Connected Successfully'"
 
       - name: Deploy to AWS EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/my-server-ec2-1.pem ubuntu@ec2-3-106-217-77.ap-southeast-2.compute.amazonaws.com "
-          cd /var/www/personal_portfolio &&
-          sudo git pull origin main &&
-          sudo composer install --no-dev &&
-          sudo php artisan migrate --force &&
-          sudo php artisan config:cache 
-          "
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/my-server-ec2-1.pem ubuntu@ec2-3-106-217-77.ap-southeast-2.compute.amazonaws.com << 'EOF'
+            cd /var/www/personal_portfolio
+            sudo git pull origin main
+            sudo composer install --no-dev
+            sudo php artisan migrate --force
+            sudo php artisan config:cache
+          EOF
